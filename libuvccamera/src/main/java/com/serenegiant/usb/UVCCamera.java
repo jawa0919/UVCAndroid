@@ -638,7 +638,7 @@ public class UVCCamera {
         final JSONArray stillFrameDescs = format.getJSONArray("stillFrameDescriptors");
         for (int i = 0; i < stillFrameDescs.length(); i++) {
             JSONObject stillFrameDesc = stillFrameDescs.getJSONObject(i);
-            final int stillCaptureMethod = format.optInt("stillCaptureMethod", 0);
+            final int stillCaptureMethod = stillFrameDesc.optInt("stillCaptureMethod", 0);
             final int formatType = stillFrameDesc.getInt("subType");
             final int endPointAddress = stillFrameDesc.getInt("endPointAddress");
             final int numCompressionPatterns = stillFrameDesc.getInt("numCompressionPatterns");
