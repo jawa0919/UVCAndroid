@@ -19,6 +19,8 @@ import com.serenegiant.usb.Format;
 import com.serenegiant.usb.IButtonCallback;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.Size;
+import com.serenegiant.usb.StillFormat;
+import com.serenegiant.usb.StillSize;
 import com.serenegiant.usb.UVCControl;
 import com.serenegiant.usb.UVCParam;
 import com.serenegiant.utils.UVCUtils;
@@ -126,6 +128,32 @@ public class CameraHelper implements ICameraHelper {
                 return mService.getSupportedSizeList(mUsbDevice);
             } catch (final Exception e) {
                 if (DEBUG) Log.e(TAG, "getSupportedSizeList:", e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<StillFormat> getSupportedStillFormatList() {
+        if (DEBUG) Log.d(TAG, "getSupportedStillFormatList:");
+        if (mService != null && mUsbDevice != null) {
+            try {
+                return mService.getSupportedStillFormatList(mUsbDevice);
+            } catch (final Exception e) {
+                if (DEBUG) Log.e(TAG, "getSupportedStillFormatList:", e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<StillSize> getSupportedStillSizeList() {
+        if (DEBUG) Log.d(TAG, "getSupportedStillSizeList:");
+        if (mService != null && mUsbDevice != null) {
+            try {
+                return mService.getSupportedStillSizeList(mUsbDevice);
+            } catch (final Exception e) {
+                if (DEBUG) Log.e(TAG, "getSupportedStillSizeList:", e);
             }
         }
         return null;

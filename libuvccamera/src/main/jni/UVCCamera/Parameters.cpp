@@ -130,6 +130,19 @@ static const char *_uvc_name_for_format_subtype(uint8_t subtype) {
 #define FRAME_INTERVAL_MAX			"maxFrameInterval"
 #define FRAME_INTERVAL_STEP			"frameIntervalStep"
 
+#define STILL_FORMATS					"stillFormats"
+
+#define STILL_FORMAT_FRAME_DESCRIPTORS	"stillFrameDescriptors"
+#define STILL_FRAME_DESC_SUBTYPE		SUBTYPE
+#define STILL_FRAME_ENDPOINT_ADDRESS	"endPointAddress"
+#define STILL_FRAME_IMAGE_SIZE_PATTERNS	"imageSizePatterns"
+#define STILL_FRAME_RESOLUTION_INDEX	"resolutionIndex"
+#define STILL_FRAME_WIDTH				FRAME_WIDTH
+#define STILL_FRAME_HEIGHT				FRAME_HEIGHT
+#define STILL_FRAME_NUM_COMPRESSION_PATTERNS		"numCompressionPatterns"
+#define STILL_FRAME_COMPRESSIONS		"compressions"
+#define STILL_CAPTURE_METHOD			"stillCaptureMethod"
+
 static void writerFormat(Writer<StringBuffer> &writer, uvc_format_desc_t *fmt_desc) {
 	uvc_frame_desc_t *frame_desc;
 	char work[256];
@@ -440,7 +453,59 @@ char *UVCDiags::getSupportedFormats(const uvc_device_handle_t *deviceHandle) {
 				}
 			}
 			writer.EndArray();
-			// FIXME still image is not supported now
+
+			// still image formats
+			writer.String(STILL_FORMATS);
+			writer.StartArray();
+			DL_FOREACH(deviceHandle->info->stream_ifs, stream_if)
+			{
+				uvc_format_desc_t *fmt_desc;
+				uvc_still_frame_desc *still_frm_desc;
+				DL_FOREACH(stream_if->format_descs, fmt_desc)
+				{
+					writer.StartObject();
+					{
+						write(writer, FORMAT_INDEX, fmt_desc->bFormatIndex);
+						write(writer, FORMAT_DESC_SUBTYPE, fmt_desc->bDescriptorSubtype);
+						writer.String(STILL_FORMAT_FRAME_DESCRIPTORS);
+						writer.StartArray();
+						DL_FOREACH(fmt_desc->still_frame_desc, still_frm_desc)
+						{
+							writer.StartObject();
+							{
+								write(writer, STILL_CAPTURE_METHOD, stream_if->bStillCaptureMethod);
+								write(writer, STILL_FRAME_DESC_SUBTYPE, still_frm_desc->bDescriptorSubtype);
+								write(writer, STILL_FRAME_ENDPOINT_ADDRESS, still_frm_desc->bEndPointAddress);
+								writer.String(STILL_FRAME_IMAGE_SIZE_PATTERNS);
+								writer.StartArray();
+								uvc_still_frame_res_t *still_frame_res;
+								DL_FOREACH(still_frm_desc->imageSizePatterns, still_frame_res)
+								{
+									writer.StartObject();
+									write(writer, STILL_FRAME_RESOLUTION_INDEX, still_frame_res->bResolutionIndex);
+									write(writer, STILL_FRAME_WIDTH, still_frame_res->wWidth);
+									write(writer, STILL_FRAME_HEIGHT, still_frame_res->wHeight);
+									writer.EndObject();
+								}
+								writer.EndArray();
+								write(writer, STILL_FRAME_NUM_COMPRESSION_PATTERNS, still_frm_desc->bNumCompressionPattern);
+								if (still_frm_desc->bNumCompressionPattern && still_frm_desc->bCompression) {
+									writer.String(STILL_FRAME_COMPRESSIONS);
+									writer.StartArray();
+									for (int i = 0; i < still_frm_desc->bNumCompressionPattern; ++i) {
+										writer.Uint(still_frm_desc->bCompression[i]);
+									}
+									writer.EndArray();
+								}
+							}
+							writer.EndObject();
+						}
+						writer.EndArray();
+					}
+					writer.EndObject();
+				}
+			}
+			writer.EndArray();
 		}
 	}
 	writer.EndObject();

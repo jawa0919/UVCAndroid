@@ -21,6 +21,8 @@ import com.herohan.uvcapp.CameraHelper;
 import com.herohan.uvcapp.ICameraHelper;
 import com.serenegiant.usb.IButtonCallback;
 import com.serenegiant.usb.Size;
+import com.serenegiant.usb.StillFormat;
+import com.serenegiant.usb.StillSize;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.utils.UriHelper;
 import com.herohan.uvcapp.R;
@@ -41,6 +43,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -206,6 +209,14 @@ public class MainActivity extends AppCompatActivity {
                     .permission(Manifest.permission.RECORD_AUDIO)
                     .request((permissions, all) -> {
                         toggleVideoRecord(!mIsRecording);
+                    });
+        });
+
+        mBinding.fabStill.setOnClickListener(v -> {
+            XXPermissions.with(this)
+                    .permission(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+                    .request((permissions, all) -> {
+                        stillImage();
                     });
         });
     }
@@ -489,6 +500,7 @@ public class MainActivity extends AppCompatActivity {
 
                 mBinding.fabPicture.setVisibility(View.VISIBLE);
                 mBinding.fabVideo.setVisibility(View.VISIBLE);
+                mBinding.fabStill.setVisibility(View.VISIBLE);
 
                 // Update record button
                 int colorId = R.color.WHITE;
@@ -504,6 +516,7 @@ public class MainActivity extends AppCompatActivity {
 
                 mBinding.fabPicture.setVisibility(View.GONE);
                 mBinding.fabVideo.setVisibility(View.GONE);
+                mBinding.fabStill.setVisibility(View.GONE);
 
                 mBinding.tvVideoRecordTime.setVisibility(View.GONE);
             }
@@ -684,5 +697,20 @@ public class MainActivity extends AppCompatActivity {
         String mm = mDecimalFormat.format(time % 3600 / 60);
         String ss = mDecimalFormat.format(time % 60);
         return hh + ":" + mm + ":" + ss;
+    }
+
+    private void stillImage() {
+        Log.d(TAG, "stillImage: -----------------------------------------------------------");
+        final List<StillFormat> list = mCameraHelper.getSupportedStillFormatList();
+        if (list == null || list.isEmpty()) {
+            Log.w(TAG, "stillImage: this camera does not support still image capture");
+            Toast.makeText(this, "not support still image", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Log.d(TAG, "StillFormat: " + list.size());
+        Log.d(TAG, "StillFormat: " + list);
+        final List<StillSize> sizelist = mCameraHelper.getSupportedStillSizeList();
+        Log.d(TAG, "StillSize: " + sizelist.size());
+        Log.d(TAG, "StillSize: " + sizelist);
     }
 }

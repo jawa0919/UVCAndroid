@@ -53,6 +53,7 @@ public class UVCCamera {
      */
     public static final int UVC_ERROR_BUSY = -6;
 
+    public static final int UVC_VS_STILL_IMAGE_FRAME = 0x03;
     public static final int UVC_VS_FORMAT_UNCOMPRESSED = 0x04;
     public static final int UVC_VS_FRAME_UNCOMPRESSED = 0x05;
     public static final int UVC_VS_FORMAT_MJPEG = 0x06;
@@ -230,6 +231,9 @@ public class UVCCamera {
         mSupportedSizeList = null;
         mCurrentSize = null;
 
+        mSupportedStillFormatList = null;
+        mSupportedStillSizeList = null;
+
         if (mControl != null) {
             mControl.release();
             mControl = null;
@@ -253,6 +257,9 @@ public class UVCCamera {
             mSupportedFormats = nativeGetSupportedFormats(mNativePtr);
             mSupportedFormatList = parseSupportedFormats(mSupportedFormats);
             mSupportedSizeList = fetchSupportedSizeList(mSupportedFormatList);
+
+            mSupportedStillFormatList = parseSupportedStillFormats(mSupportedFormats);
+            mSupportedStillSizeList = fetchSupportedStillSizeList(mSupportedStillFormatList);
         }
     }
 
@@ -570,6 +577,107 @@ public class UVCCamera {
         if (mCtrlBlock != null) {
             nativeSetCaptureDisplay(mNativePtr, null);
         }
+    }
+
+    protected List<StillFormat> mSupportedStillFormatList;
+    protected List<StillSize> mSupportedStillSizeList;
+
+    public List<StillFormat> getSupportedStillFormatList() {
+        if (mSupportedStillFormatList == null || mSupportedStillFormatList.isEmpty()) {
+            updateSupportedFormats();
+        }
+        List<StillFormat> list = new ArrayList<>();
+        if (mSupportedStillFormatList != null) {
+            for (StillFormat format : mSupportedStillFormatList) {
+                list.add(format.clone());
+            }
+        }
+        return list;
+    }
+
+    public List<StillSize> getSupportedStillSizeList() {
+        if (mSupportedStillFormatList == null || mSupportedStillFormatList.isEmpty()) {
+            updateSupportedFormats();
+        }
+        List<StillSize> list = new ArrayList<>();
+        if (mSupportedStillSizeList != null) {
+            for (StillSize size :
+                    mSupportedStillSizeList) {
+                list.add(size.clone());
+            }
+        }
+        return list;
+    }
+
+    private List<StillFormat> parseSupportedStillFormats(final String supportedStillFormats) {
+        List<StillFormat> formatList = new ArrayList<>();
+        if (!TextUtils.isEmpty(supportedStillFormats)) {
+            try {
+                final JSONObject json = new JSONObject(supportedStillFormats);
+                final JSONArray formatsJSON = json.getJSONArray("stillFormats");
+                for (int i = 0; i < formatsJSON.length(); i++) {
+                    final JSONObject formatJSON = formatsJSON.getJSONObject(i);
+                    final int index = formatJSON.getInt("index");
+                    final int formatType = formatJSON.getInt("subType");
+                    // this uvc library support for mjpeg and uncompressed format
+                    if (formatType == UVC_VS_FORMAT_MJPEG
+                            || formatType == UVC_VS_FORMAT_UNCOMPRESSED) {
+                        List<StillFormat.Descriptor> descriptorList = parseStillFrameDescriptors(formatJSON, index);
+                        formatList.add(new StillFormat(index, formatType, descriptorList));
+                    }
+                }
+            } catch (final JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return formatList;
+    }
+
+    private List<StillFormat.Descriptor> parseStillFrameDescriptors(final JSONObject format, final int index) throws JSONException {
+        List<StillFormat.Descriptor> descriptorList = new ArrayList<>();
+        final JSONArray stillFrameDescs = format.getJSONArray("stillFrameDescriptors");
+        for (int i = 0; i < stillFrameDescs.length(); i++) {
+            JSONObject stillFrameDesc = stillFrameDescs.getJSONObject(i);
+            final int stillCaptureMethod = format.optInt("stillCaptureMethod", 0);
+            final int formatType = stillFrameDesc.getInt("subType");
+            final int endPointAddress = stillFrameDesc.getInt("endPointAddress");
+            final int numCompressionPatterns = stillFrameDesc.getInt("numCompressionPatterns");
+
+            List<Integer> compressions = new ArrayList<>();
+            if (stillFrameDesc.has("compressions")) {
+                final JSONArray compressionJSONArray = stillFrameDesc.getJSONArray("compressions");
+                for (int j = 0; j < compressionJSONArray.length(); j++) {
+                    compressions.add(compressionJSONArray.getInt(j));
+                }
+            }
+
+            final JSONArray imageSizePatterns = stillFrameDesc.getJSONArray("imageSizePatterns");
+
+            for (int j = 0; j < imageSizePatterns.length(); j++) {
+                JSONObject imageSizePattern = imageSizePatterns.getJSONObject(j);
+                descriptorList.add(new StillFormat.Descriptor(
+                        index,
+                        formatType,
+                        imageSizePattern.getInt("width"),
+                        imageSizePattern.getInt("height"),
+                        imageSizePattern.getInt("resolutionIndex"),
+                        endPointAddress,
+                        numCompressionPatterns,
+                        compressions,
+                        stillCaptureMethod));
+            }
+        }
+        return descriptorList;
+    }
+
+    private List<StillSize> fetchSupportedStillSizeList(List<StillFormat> formatList) {
+        List<StillSize> sizeList = new ArrayList<>();
+        for (StillFormat format : formatList) {
+            for (StillFormat.Descriptor descriptor : format.frameDescriptors) {
+                sizeList.add(new StillSize(format.type, descriptor.width, descriptor.height, descriptor.stillCaptureMethod, descriptor.compressions));
+            }
+        }
+        return sizeList;
     }
 
     /**

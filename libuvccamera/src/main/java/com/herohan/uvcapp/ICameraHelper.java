@@ -8,6 +8,8 @@ import com.serenegiant.usb.Format;
 import com.serenegiant.usb.IButtonCallback;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.Size;
+import com.serenegiant.usb.StillFormat;
+import com.serenegiant.usb.StillSize;
 import com.serenegiant.usb.UVCControl;
 import com.serenegiant.usb.UVCParam;
 import com.serenegiant.utils.UVCUtils;
@@ -26,6 +28,10 @@ public interface ICameraHelper {
     List<Format> getSupportedFormatList();
 
     List<Size> getSupportedSizeList();
+
+    List<StillFormat> getSupportedStillFormatList();
+    
+    List<StillSize> getSupportedStillSizeList();
 
     Size getPreviewSize();
 

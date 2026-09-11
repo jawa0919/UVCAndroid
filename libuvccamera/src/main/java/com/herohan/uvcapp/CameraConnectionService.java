@@ -13,6 +13,8 @@ import com.serenegiant.usb.Format;
 import com.serenegiant.usb.IButtonCallback;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.Size;
+import com.serenegiant.usb.StillFormat;
+import com.serenegiant.usb.StillSize;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener;
 import com.serenegiant.usb.USBMonitor.UsbControlBlock;
@@ -247,6 +249,24 @@ class CameraConnectionService {
             final CameraInternal cameraInternal = getCamera(device);
             if (cameraInternal != null) {
                 return cameraInternal.getSupportedSizeList();
+            }
+            return null;
+        }
+
+        @Override
+        public List<StillFormat> getSupportedStillFormatList(final UsbDevice device) {
+            final CameraInternal cameraInternal = getCamera(device);
+            if (cameraInternal != null) {
+                return cameraInternal.getSupportedStillFormatList();
+            }
+            return null;
+        }
+
+        @Override
+        public List<StillSize> getSupportedStillSizeList(final UsbDevice device) {
+            final CameraInternal cameraInternal = getCamera(device);
+            if (cameraInternal != null) {
+                return cameraInternal.getSupportedStillSizeList();
             }
             return null;
         }

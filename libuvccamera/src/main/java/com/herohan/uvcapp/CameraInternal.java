@@ -9,6 +9,8 @@ import com.serenegiant.usb.Format;
 import com.serenegiant.usb.IButtonCallback;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.Size;
+import com.serenegiant.usb.StillFormat;
+import com.serenegiant.usb.StillSize;
 import com.serenegiant.usb.USBMonitor.UsbControlBlock;
 import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usb.UVCControl;
@@ -108,6 +110,22 @@ final class CameraInternal implements ICameraInternal {
     public List<Size> getSupportedSizeList() {
         if (mUVCCamera != null) {
             return mUVCCamera.getSupportedSizeList();
+        }
+        return null;
+    }
+
+    @Override
+    public List<StillFormat> getSupportedStillFormatList() {
+        if (mUVCCamera != null) {
+            return mUVCCamera.getSupportedStillFormatList();
+        }
+        return null;
+    }
+
+    @Override
+    public List<StillSize> getSupportedStillSizeList() {
+        if (mUVCCamera != null) {
+            return mUVCCamera.getSupportedStillSizeList();
         }
         return null;
     }
@@ -240,7 +258,10 @@ final class CameraInternal implements ICameraInternal {
                         throw new CameraException(CameraException.CAMERA_OPEN_ERROR_UNKNOWN, context.getString(R.string.error_messge_camera_open_unknown));
                 }
             }
-            if (DEBUG) Log.i(TAG, "supportedSize:" + mUVCCamera.getSupportedSize());
+            if (DEBUG)
+                Log.i(TAG, "supportedSize:" + mUVCCamera.getSupportedSize().substring(0, 4000));
+            if (DEBUG)
+                Log.i(TAG, "supportedSize:" + mUVCCamera.getSupportedSize().substring(4000));
 
             setPreviewConfig(previewConfig);
 

@@ -4,6 +4,8 @@ import com.serenegiant.usb.Format;
 import com.serenegiant.usb.IButtonCallback;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.Size;
+import com.serenegiant.usb.StillFormat;
+import com.serenegiant.usb.StillSize;
 import com.serenegiant.usb.UVCControl;
 import com.serenegiant.usb.UVCParam;
 
@@ -29,6 +31,10 @@ interface ICameraConnection {
     List<Format> getSupportedFormatList(UsbDevice device);
 
     List<Size> getSupportedSizeList(UsbDevice device);
+
+    List<StillFormat> getSupportedStillFormatList(UsbDevice device);
+
+    List<StillSize> getSupportedStillSizeList(UsbDevice device);
 
     Size getPreviewSize(UsbDevice device);
 
