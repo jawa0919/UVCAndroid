@@ -1,4 +1,4 @@
 jdk:
   - openjdk17
 install:
-  - ./gradlew :libuvccamera:publishToMavenLocal
+  - ORG_GRADLE_PROJECT_RELEASE_SIGNING_ENABLED=false ./gradlew :libuvccamera:publishToMavenLocal
