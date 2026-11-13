@@ -1,5 +1,4 @@
-# jitpack.yml（放在仓库根目录）
 jdk:
   - openjdk17
 install:
-  - ./gradlew :uvcCamera:publishToMavenLocal
+  - ./gradlew :libuvccamera:publishToMavenLocal
