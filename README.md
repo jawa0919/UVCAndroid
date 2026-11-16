@@ -22,6 +22,26 @@ dependencies {
     implementation 'com.herohan:UVCAndroid:1.0.13'
 }
 ```
+##### JitPack (fork builds)
+
+This fork can also be consumed from [JitPack](https://jitpack.io/#jawa0919/UVCAndroid)
+without waiting for a Maven Central release:
+
+```groovy
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.jawa0919.UVCAndroid:libuvccamera:v1.0.14'
+}
+```
+
+`v1.0.14` is the tag (or commit hash) to build; replace it with the tag you want.
+On GitHub, push a tag / create a release, then request the build once at
+https://jitpack.io/#jawa0919/UVCAndroid. The first request triggers the build.
+
 R8 / ProGuard
 -------------
 

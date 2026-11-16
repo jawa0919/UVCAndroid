@@ -1,0 +1,16 @@
+// JitPack-only publishing configuration.
+//
+// Applied from libuvccamera/build.gradle when the build runs on JitPack
+// (JitPack sets JITPACK=true in the build environment).
+// The Maven Central configuration in publish_aar.gradle is left untouched and
+// keeps being used for every other (local / CI) build.
+//
+// libuvccamera already applies com.vanniktech.maven.publish, which creates a
+// 'maven' publication (AAR + sources + javadoc) from the release variant.
+// On JitPack only the coordinates have to change, so that JitPack serves the
+// artifact as com.github.jawa0919.UVCAndroid:libuvccamera:<tag>.
+// The artifact id defaults to project.name, i.e. "libuvccamera".
+
+group = 'com.github.jawa0919.UVCAndroid'
+// JitPack exposes the tag being built as VERSION; fall back to git describe.
+version = System.getenv('VERSION') ?: System.getenv('GIT_DESCRIBE') ?: 'main-SNAPSHOT'

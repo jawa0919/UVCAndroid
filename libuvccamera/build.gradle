@@ -87,4 +87,9 @@ ext {
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
 }
 
-apply from: "../publish_aar.gradle"
+if (System.getenv('JITPACK') == 'true') {
+    // JitPack build: publish with JitPack coordinates (no Maven Central signing).
+    apply from: "../jitpack_publish.gradle"
+} else {
+    apply from: "../publish_aar.gradle"
+}

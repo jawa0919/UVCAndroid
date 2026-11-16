@@ -1,0 +1,15 @@
+# JitPack build configuration
+# https://jitpack.io/docs/BUILDING/#custom-commands
+jdk:
+  - openjdk17
+
+before_install:
+  # libuvccamera contains native code (ndkBuild). Make sure the NDK used by
+  # AGP 8.5 (26.1.10909125) and the compile SDK are installed in the JitPack image.
+  - 'SM=$(command -v sdkmanager || echo "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"); if [ -x "$SM" ] && [ ! -d "$ANDROID_HOME/ndk/26.1.10909125" ]; then yes | "$SM" --licenses >/dev/null 2>&1 || true; yes | "$SM" "ndk;26.1.10909125" "platforms;android-34" "build-tools;34.0.0" >/dev/null; fi'
+
+install:
+  # Only the library module is published. app/demo are excluded from the build
+  # because JITPACK=true (see settings.gradle).
+  - chmod +x ./gradlew
+  - ./gradlew :libuvccamera:publishToMavenLocal --no-daemon --stacktrace
