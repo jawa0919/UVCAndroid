@@ -12,5 +12,27 @@
 // The artifact id defaults to project.name, i.e. "libuvccamera".
 
 group = 'com.github.jawa0919.UVCAndroid'
-// JitPack exposes the tag being built as VERSION; fall back to git describe.
-version = System.getenv('VERSION') ?: System.getenv('GIT_DESCRIBE') ?: 'main-SNAPSHOT'
+// JitPack exposes the tag being built as VERSION. If that is not available,
+// fall back to git describe (jitpack.yml sets safe.directory so git works in
+// the JitPack container). The version must match the tag, because JitPack
+// serves the artifact under the requested tag.
+version = {
+    def fromEnv = System.getenv('VERSION')?.trim()
+    if (fromEnv) return fromEnv
+    def gitDescribe = System.getenv('GIT_DESCRIBE')?.trim()
+    if (gitDescribe) return gitDescribe
+    try {
+        def output = new ByteArrayOutputStream()
+        project.exec {
+            workingDir rootProject.projectDir
+            commandLine 'git', 'describe', '--tags', '--abbrev=0'
+            standardOutput = output
+            ignoreExitValue = true
+        }
+        def tag = output.toString().trim()
+        if (tag) return tag
+    } catch (Exception ignored) {
+        // fall through to the snapshot fallback below
+    }
+    return 'main-SNAPSHOT'
+}()

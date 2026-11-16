@@ -4,6 +4,10 @@ jdk:
   - openjdk17
 
 before_install:
+  # JitPack checks the repository out under a different owner, so git refuses to
+  # work ("detected dubious ownership in repository at '/build'"). Allow it,
+  # otherwise tag discovery (VERSION / git describe) fails.
+  - 'git config --global --add safe.directory "*"'
   # libuvccamera contains native code (ndkBuild). Make sure the NDK used by
   # AGP 8.5 (26.1.10909125) and the compile SDK are installed in the JitPack image.
   - 'SM=$(command -v sdkmanager || echo "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"); if [ -x "$SM" ] && [ ! -d "$ANDROID_HOME/ndk/26.1.10909125" ]; then yes | "$SM" --licenses >/dev/null 2>&1 || true; yes | "$SM" "ndk;26.1.10909125" "platforms;android-34" "build-tools;34.0.0" >/dev/null; fi'
