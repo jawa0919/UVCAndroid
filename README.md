@@ -54,6 +54,7 @@ ProGuard users must manually add the below options.
 -keepclassmembers class * implements com.serenegiant.usb.IButtonCallback {*;}
 -keepclassmembers class * implements com.serenegiant.usb.IFrameCallback {*;}
 -keepclassmembers class * implements com.serenegiant.usb.IStatusCallback {*;}
+-keepclassmembers class * implements com.serenegiant.usb.IStillImageCallback {*;}
 ```
 
 Requirements
