@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.jawa0919.UVCAndroid:libuvccamera:v1.0.14'
+    implementation 'com.github.jawa0919.UVCAndroid:libuvccamera:tag'
 }
 ```
 
